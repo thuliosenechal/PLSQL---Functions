@@ -1,0 +1,65 @@
+DECLARE
+
+vRetorno   VARCHAR2(2000);
+vContador  INT:=0;
+vString    VARCHAR2(2000):=';;SENECHAL_1;;SENECHAL_2;;SENECHAL_3;;SENECHAL_4;;';
+
+FUNCTION getValue(fString VARCHAR2,fSeparador VARCHAR2,fIndex INT) RETURN VARCHAR2 IS
+
+  vRetorno    VARCHAR2(2000);
+  fSep        INT:=0;
+  fPosInicial INT:=0;
+  fPosFinal   INT:=0;
+  
+BEGIN
+
+  SELECT LENGTH(fSeparador)
+    INTO fSep
+    FROM DUAL;
+
+  SELECT INSTR(fString,fSeparador,1,fIndex)+fSep
+    INTO fPosInicial
+    FROM DUAL;
+
+  SELECT INSTR(fString,fSeparador,1,fIndex+1)-fPosInicial
+    INTO fPosFinal
+    FROM DUAL;
+
+  SELECT SUBSTR(fString,fPosInicial,fPosFinal)
+    INTO vRetorno
+    FROM DUAL;
+
+  RETURN vRetorno;
+
+END getValue;
+
+FUNCTION maxValue(fString VARCHAR2,fSeparador VARCHAR2) RETURN INT IS
+
+  vPosicao  INT:=1;
+  vContador INT:=0;
+
+BEGIN
+  
+  WHILE vPosicao <> 0 LOOP
+
+    vContador:= vContador + 1;
+
+    SELECT INSTR(fString,fSeparador,1,vContador)
+      INTO vPosicao
+      FROM DUAL;
+
+  END LOOP;
+
+  RETURN vContador-2;
+
+END maxValue;
+
+BEGIN
+
+  FOR N IN 1.. maxValue(vString,';;') LOOP
+    DBMS_OUTPUT.put_line('Num_' || N);
+    vRetorno:=getValue(vString,';;',N);
+    DBMS_OUTPUT.put_line('  ' || vRetorno);
+  END LOOP;
+
+END;
